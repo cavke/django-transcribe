@@ -2,16 +2,31 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Audio(models.Model):
-    name = models.CharField(max_length=128)
-    type = models.CharField(max_length=32)
-    file_name = models.CharField(max_length=255)
+class CreatedUpdateAtModel(models.Model):
+    created_at = models.DateTimeField(
+        verbose_name='Created at',
+        auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        verbose_name='Updated at',
+        auto_now=True
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Audio(CreatedUpdateAtModel):
     CREATED = 'CR'
     COMPLETED = 'CO'
     STATUS_CHOICES = [
         (CREATED, 'Created'),
         (COMPLETED, 'Completed'),
     ]
+
+    name = models.CharField(max_length=128)
+    type = models.CharField(max_length=32)
+    file_name = models.CharField(max_length=255)
     status = models.CharField(
         max_length=2,
         choices=STATUS_CHOICES,
@@ -19,8 +34,6 @@ class Audio(models.Model):
         db_index=True
     )
     content = models.BinaryField()
-    created_at = models.DateTimeField
-    updated_at = models.DateTimeField
 
     class Meta:
         ordering = ["-name"]
@@ -29,12 +42,10 @@ class Audio(models.Model):
         return self.name
 
 
-class Transcription(models.Model):
+class Transcription(CreatedUpdateAtModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    audio = models.ForeignKey(Audio, on_delete=models.CASCADE)
+    audio = models.ForeignKey(Audio, on_delete=models.CASCADE, )
     charset = models.ForeignKey
-    created_at = models.DateTimeField
-    updated_at = models.DateTimeField
     text = models.TextField(null=False)
 
 
