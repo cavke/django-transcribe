@@ -42,19 +42,19 @@ class Audio(CreatedUpdateAtModel):
         return self.name
 
 
-class Transcription(CreatedUpdateAtModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    audio = models.ForeignKey(Audio, on_delete=models.CASCADE, )
-    charset = models.ForeignKey
-    text = models.TextField(null=False)
-
-
 class Charset(models.Model):
     name = models.CharField(max_length=128)
     allowed_characters = models.CharField(max_length=1024)
 
     def __str__(self):
         return self.name
+
+
+class Transcription(CreatedUpdateAtModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
+    audio = models.ForeignKey(Audio, on_delete=models.CASCADE, db_index=True)
+    charset = models.ForeignKey(Charset, on_delete=models.PROTECT, db_index=True)
+    text = models.TextField(null=False)
 
 
 class Configuration(models.Model):
