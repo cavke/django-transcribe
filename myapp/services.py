@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+import re
 
 
 class ValidationService(object):
@@ -10,16 +11,15 @@ class ValidationService(object):
         :param text: to validate
         :return:
         """
-        print('rule1:' + text)
+        print('rule1 triggered')
         if text == "":
             raise ValidationError('Text is empty')
-        for c in text:
-            if c not in allowed_characters:
-                raise ValidationError(
-                    'Character not allowed',
-                    params={'value': c},
-                )
-
+        invalid_string = re.sub(allowed_characters, "", text)
+        if invalid_string != "":
+            raise ValidationError(
+                'Invalid characters',
+                params={'value': invalid_string},
+            )
 
     @staticmethod
     def validate_rule2(text):
@@ -29,6 +29,9 @@ class ValidationService(object):
         """
         if text == "":
             raise ValidationError('Text is empty')
+        x = re.search("\\b[a-z]+[A-Z]+[a-z]+\\b", text)
+        if x is not None:
+            raise ValidationError('Invalid characters at position: ' + str(x.start()))
 
     @staticmethod
     def validate_rule3(text):
@@ -38,7 +41,11 @@ class ValidationService(object):
         """
         if text == "":
             raise ValidationError('Text is empty')
+        x = re.search("\\b\\s{2,}\\b", text)
+        if x is not None:
+            raise ValidationError('Invalid characters at position: ' + str(x.start()))
 
+# TODO finish rules 4 and 5
     @staticmethod
     def validate_rule4(text):
         """
